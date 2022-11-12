@@ -13,12 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('servey_question_answers', function (Blueprint $table) {
+        Schema::create('survey_question_answers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('survey_question_id');
-            $table->foreign('survey_question_id')->references('id')->on('servey_questions')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('survey_question_id')->references('id')->on('survey_questions')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedBigInteger('survey_answer_id');
-            $table->foreign('survey_answer_id')->references('id')->on('servey_answers')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('survey_answer_id')->references('id')->on('survey_answers')->onUpdate('cascade')->onDelete('cascade');
             $table->text('answer');
             $table->timestamps();
         });
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('servey_question_answers');
+        Schema::dropIfExists('survey_question_answers');
     }
 };

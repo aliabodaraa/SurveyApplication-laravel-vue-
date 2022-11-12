@@ -1,6 +1,6 @@
 <?php
 use App\Http\Controllers\AuthApiController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SurveyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +20,9 @@ Route::middleware('auth:sanctum')->group(function(){
         return $request->user();
     });
     Route::post('/logout',[AuthApiController::class,'logout']);
-    Route::resource('/survey', SurveyController::class);
+    Route::resource('survey', SurveyController::class);
+    //Route::post('/survey',[SurveyController::class,'store']);
+
 });
 Route::post('/store', [AuthApiController::class,'store']);
 Route::post('/login', [AuthApiController::class,'login']);

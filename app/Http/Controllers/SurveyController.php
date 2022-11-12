@@ -7,6 +7,9 @@ use App\Http\Requests\StoreSurveyRequest;
 use App\Http\Requests\UpdateSurveyRequest;
 use Illuminate\Http\Request;
 use App\Http\Resources\SurveyResource;
+
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 class SurveyController extends Controller
 {
     /**
@@ -27,11 +30,46 @@ class SurveyController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(StoreSurveyRequest $request)
-    {
-        $result = Survey::create($request->validated());
-        return new SurveyResource($result);
+    {        
+        $data=$request->validated();
+        if(isset($data['image'])){
+            $relativePath = $this->saveImage($data['image']);
+            $data['image'] = $relativePath;
+        }
+        $survey = Survey::create($data);
+        return new SurveyResource($survey);
     }
+    public function saveImage($image) {
+        //check if the image is valid base64 string
+        if(preg_match('/^data:image\/(\w+);base64,/', $image, $matchers)){
+                  //like data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABLk...
+            //take out the base64 encoded text without mime type
+            $encoded_image = substr($image, strpos($image,',')+1);   
+            //get file extension
+            $type=strtolower($matchers[1]);
+            //check if file is an image
+            if(! in_array($type,['jpg','jpeg','gif','png']))
+                throw new \Exception('invalid image type');
 
+            $encoded_image = str_replace(' ','+',$encoded_image);
+            $decoded_image = base64_decode($encoded_image);
+            if($decoded_image == false)
+                throw new \Exception('base64 decode faild');
+
+        }else{
+            throw new \Exception('did not match data URI with image data');
+        }
+        $dir='images/';
+        $file = Str::random().'.'.$type;
+        $relativePath = $dir.$file;
+        $absolutePath = public_path($dir);
+        if(! File::exists($absolutePath)){
+            File::makeDirectory($absolutePath,8755,true);
+        }
+        file_put_contents($relativePath, $decoded_image);
+
+        return $relativePath;
+    }
     /**
      * Display the specified resource.
      *
@@ -56,7 +94,21 @@ class SurveyController extends Controller
      */
     public function update(UpdateSurveyRequest $request, Survey $survey)
     {
-        $survey->update($request->validated());
+        //return response()->json("DONE Update", 200);
+        $data = $request->validated();
+        if(isset($data['image'])){
+            $relativePath= $this->saveImage($data['image']);
+            $data['image']=$relativePath;
+        }
+
+        //if there is an old image , delete it
+        if($survey->image){
+            $absolutePath = public_path($survey->image);
+            File::delete($absolutePath);
+        }
+
+
+        $survey->update($data);
 
         return new SurveyResource($survey);
     }

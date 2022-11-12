@@ -11,15 +11,17 @@ const count = ref(0)
 <template>
   <h1>{{ msg }}</h1>
 
-  <div class="card">
+  <div class="card" style="background-color:#569">
     <button type="button" @click="count++">count is {{ count }}</button>
     <p>
       Edit
       <code>components/HelloWorld.vue</code> to test HMR
     </p>
-  </div>
-
-  <p>
+<h2 style="color:red">{{this.$store.state['user']['data']['name']}} child</h2>
+<h2 style="color:red">{{this.$store.getters.getData}} use getters in nested component</h2>
+ <h2 style="color:red">{{this.$store.commit('changeName',{new_name:'Ahamd'})}} use actions in nested component</h2>
+</div>
+ <p>
     Check out
     <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
       >create-vue</a
