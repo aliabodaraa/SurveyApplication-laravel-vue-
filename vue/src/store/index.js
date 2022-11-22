@@ -376,7 +376,6 @@ const store = createStore({
                     .then((res) => {
                         //commit("saveSurvey", res.data);
                         commit("setCurrentSurvey", res.data);
-                        s
                         //console.log(res.data.data.id);
                         return res.data.data.id;
                     });
@@ -397,7 +396,10 @@ const store = createStore({
                     commit("setCurrentSurveyLoading", false);
                     throw err;
                 });
-        }
+        },
+        deleteSurvey({}, id) {
+            return axiosClient.delete(`/survey/${id}`);
+        },
     },
     modules: {
 

@@ -1,11 +1,14 @@
 <template>
-    <PageComponents>
+    <PageComponents :title="route.params.id ? model.title :'Create a Survey'">
         <template v-slot:header>
             <div class="flex items-center ml-6 justify-between">
                 <h1 class="text-3xl font-bold text-grey-900">
                     {{ route.params.id ? model.title :"Create a Survey" }}
                 </h1>
             </div>
+            <button @click="deleteSurvey()"
+            v-if="route.params.id" type="button"
+            class="mr-10 float-right py-2 px-3 text-white bg-red-500 rounded-md hover:bg-red-700 border-white-200 hover:border-red-200">Delete</button>
         </template>
        <!-- {{ model }} -->
         <!-- <pre>{{model}}</pre> -->
@@ -200,15 +203,21 @@
         const file =ev.target.files[0];
         const reader = new FileReader(file);//convert the image selected image with base64 via "reader.result" value
         reader.onload = ()=>{
-            //console.log(file,reader);
             //console.log(reader.result);//result of encoding with base64 //
             //the field to send on backend and apply validations
             model.value.image = reader.result;//result of encoding with base64 //for sending to backend
             //the field to display here
             model.value.image_url = reader.result;//result of encoding with base64 //for displaying in frontend only
+            console.log(file,reader,reader.result);
         };
 
         reader.readAsDataURL(file);//?? Why
-
+    }
+    function deleteSurvey(){
+        if(confirm("Are you sure you want to delete ? Operation can't be Undone")){
+            store.dispatch('deleteSurvey',model.value.id).then(()=>{
+                router.push({name:"Surveys"})
+            });
+        }
     }
   </script>
