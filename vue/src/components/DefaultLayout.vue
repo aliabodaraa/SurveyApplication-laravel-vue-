@@ -211,4 +211,5 @@ import { ref } from "vue";
 
       let mssg =ref('');
   mssg.value="Hello "+user.value;
+  console.log(sessionStorage.getItem('TOKEN'));
   </script>
