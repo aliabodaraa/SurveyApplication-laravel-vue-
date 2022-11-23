@@ -1,6 +1,7 @@
+
 <template>
 <div class="flex items-center justify-between">
-    <h3 class="text-lg font-bold">
+    <h3 class="text-lg font-bold">question :
         {{ index + 1 }} - {{ model.question }}
     </h3>
 
@@ -114,7 +115,9 @@
             You don't Have Any Options
         </div>
         <!-- Option List -->
-            <div v-else v-for="(option,index) in model.data.options"
+            <div 
+            v-else 
+            v-for="(option,index) in model.data.options"
             :key="option.uuid"
             class="flex items-center mb-1 gap-5">
             <span class="w-6 text-sm">{{index+1}}</span>
@@ -159,7 +162,8 @@
         );
     const emit = defineEmits(['change','addQuestion','deleteQuestion']);
     //Re-create the whole Questions data to avoid unintentional reference change
-    const model = ref(JSON.parse(JSON.stringify(props.question)));
+    const model = ref(props.question);
+    console.log(model);
     //Get QuestionType from vuex
 const questionTypes = computed(() => store.state.questionTypes);
 
@@ -196,7 +200,7 @@ function dataChange(){
     if(! shouldHaveOptions()){
             delete data.data.options;
     }
-    this.$emit('change', data);
+    emit('change', data);
 }
 function addQuestion(){
     emit('addQuestion', props.index + 1);

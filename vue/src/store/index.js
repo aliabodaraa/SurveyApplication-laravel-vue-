@@ -118,18 +118,18 @@ const store = createStore({
                     .then((res) => {
                         //commit("saveSurvey", res.data);
                         commit("setCurrentSurvey", res.data);
-                        //console.log(res.data.data.id);
+                        console.log(res.data);
                         return res.data.data.id;
                     });
             }
             return response;
         },
-        getSurveys({ commit }, id) {
+        getSurvey({ commit }, id) {
             console.log("LOADING ....");
             commit("setCurrentSurveyLoading", true);
             return axiosClient.get(`/survey/${id}`)
                 .then((res) => {
-                    console.log(res);
+                    console.log("getSurvey", res);
                     commit("setCurrentSurvey", res.data);
                     commit("setCurrentSurveyLoading", false);
                     return res;

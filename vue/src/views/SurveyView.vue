@@ -18,7 +18,7 @@
                 <!-- Survey fields -->
                     <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
                     <!-- Image -->
-                    <div>
+                    <div id="img">
                         <label class="block text-sm font-medium text-grey-700">
                             Image
                         </label>
@@ -51,28 +51,28 @@
                     </div>
                     <!-- / Image -->
                     <!--  Title -->
-                    <div>
+                    <div id="title">
                         <label for="title" class="block text-sm font-medium text-grey-700">Title</label>
                         <input type="text" name="title" id="title" v-model="model.title" autocomplete="survey_title"
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-grey-300 rounded-md">
                     </div>
                     <!-- / Title -->
                     <!--  Description -->
-                    <div>
+                    <div class="description">
                         <label for="description" class="block text-sm font-medium text-grey-700">description</label>
                         <textarea name="description" id="description" v-model="model.description" autocomplete="survey_description"
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-grey-300 rounded-md"></textarea>
                     </div>
                     <!-- / Description -->
                     <!--  Expire_Date -->
-                    <div>
+                    <div id="expire_date">
                         <label for="expire_date" class="block text-sm font-medium text-grey-700">expire_date</label>
                         <input type="date" name="expire_date" id="expire_date" v-model="model.expire_date" autocomplete="survey_expire_date"
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-grey-300 rounded-md">
                     </div>
                     <!-- / Expire_Date -->
                     <!--  Status -->
-                    <div class="flex items-start">
+                    <div id="status" class="flex items-start">
                         <div class="flex items-center h-5">
                             <input type="checkbox" name="status" id="status" v-model="model.status" autocomplete="survey_status"
                             class="focus:ring-indigo-500 
@@ -87,7 +87,7 @@
                     <!-- / Status -->                
                 </div>
                 <!--Questions  -->
-                <div class="px-4 py-5 bg-white space-y-6 cm:p-6">
+                <div id="questions" class="px-4 py-5 bg-white space-y-6 cm:p-6">
                     <h3 class="text-2xl font-semibold flex items-center justify-between">
                         Questions
                         <!-- Add New Qujestion -->
@@ -101,8 +101,9 @@
                     <div v-if="!model.questions.length" class="text-center text-grey-600">
                         You don't have any questions created
                     </div>
-                    <div v-else :key="question.id" v-for="(question,index) in model.questions">
-                    <QuestionEditor 
+                    <div v-else>
+                    <QuestionEditor
+                        :key="question.id" v-for="(question,index) in model.questions"
                         :question="question" 
                         :index="index" 
                         @change="questionChange"
@@ -111,7 +112,6 @@
                         />
                     </div>
                 </div>
-  
                 <!-- /Questions  -->
             <!-- / Survey fields -->
             <div class="px-4 py-3 bg-grey-50 text-right sm:px-6">
@@ -190,6 +190,7 @@
         });
     }
     function saveSurvey(){
+        console.log(model.value);
             store.dispatch("saveSurvey", model.value)
             .then((id)=>{
                 router.push({

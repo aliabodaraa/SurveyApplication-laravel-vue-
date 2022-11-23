@@ -10,6 +10,11 @@ use App\Http\Resources\SurveyResource;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use App\Models\SurveyQuestion;
+
 class SurveyController extends Controller
 {
     /**
@@ -20,7 +25,7 @@ class SurveyController extends Controller
     public function index(Request $request)
     {
         $user=$request->user();
-        return SurveyResource::collection(Survey::where('user_id',$user->id)->paginate());
+        return SurveyResource::collection(Survey::where('user_id',$user->id)->paginate(50));
     }
 
     /**
@@ -37,8 +42,46 @@ class SurveyController extends Controller
             $data['image'] = $relativePath;
         }
         $survey = Survey::create($data);
+
+        //Create New Questions
+        foreach ($data['questions'] as $question) {
+            $question['survey_id']=$survey->id;
+            $this->createQuestion($question);
+        }
+
         return new SurveyResource($survey);
     }
+
+    private function createQuestion($data){
+        //option (data column) in DB after encodeing
+        //{"options":[
+            //    {
+            //    "uuid":"d00a3d2d-40ab-4565-b53b-f409b09c56ee",
+            //    "text":"newasd"
+            //    }
+         //]
+        //}
+        if(is_array($data['data'])){//'data'is assosiation array here but is an js Object in frontEnd side
+            $data['data']=json_encode($data['data']);//convert assosiation array to json for storing it in DB
+        }
+        $validator=Validator::make($data,[
+            'question'=>'required|string',
+            'type'=>['required',Rule::in([
+                    Survey::TYPE_TEXT,
+                    Survey::TYPE_TEXTAREA,
+                    Survey::TYPE_SELECT,
+                    Survey::TYPE_RADIO,
+                    Survey::TYPE_CHECKBOX
+            ])],
+            'description'=>'nullable|string',
+            'data'=>'present',
+            'survey_id'=>'exists:App\Models\Survey,id'
+            //or    'survey_id'=>'exists:surveys,id'
+
+        ]);
+        return SurveyQuestion::create($validator->validated());
+    }
+
     public function saveImage($image) {
         //check if the image is valid base64 string
         if(preg_match('/^data:image\/(\w+);base64,/', $image, $matchers)){
