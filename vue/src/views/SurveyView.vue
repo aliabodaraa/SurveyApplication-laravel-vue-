@@ -13,7 +13,7 @@
        <!-- {{ model }} -->
         <!-- <pre>{{model}}</pre> -->
         <div v-if="surveyLoading" class="flex justify-center">Loading ...</div>
-        <form v-else @submit.prevent="saveSurvey" >
+        <form v-else @submit.prevent="saveSurvey" class="animate-fade-in-down">
             <div class="shadow sm:rounded-md sm:overflow-hidden">
                 <!-- Survey fields -->
                     <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
@@ -193,6 +193,8 @@
         console.log(model.value);
             store.dispatch("saveSurvey", model.value)
             .then((id)=>{
+                store.commit('notify',
+                {type:'success',message:'Survey Was Successfully Updated'});
                 router.push({
                     name:"SurveyView",
                     params:{id : parseInt(id)}

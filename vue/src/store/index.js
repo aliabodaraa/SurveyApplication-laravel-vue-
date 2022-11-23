@@ -24,7 +24,13 @@ const store = createStore({
         },
         surveys: {
             loading: false,
+            links: [],
             data: [],
+        },
+        notification: {
+            show: false,
+            type: null,
+            message: null,
         },
         questionTypes: ["text", "select", "radio", "checkbox", "textarea"],
     },
@@ -66,10 +72,19 @@ const store = createStore({
         },
         setSurveys(state, surveys) {
             //debugger;
+            state.surveys.links = surveys.meta.links;
             state.surveys.data = surveys.data;
         },
         setSurveysLoading(state, loading) {
             state.surveys.loading = loading;
+        },
+        notify: (state, { message, type }) => {
+            state.notification.show = true;
+            state.notification.type = type;
+            state.notification.message = message;
+            setTimeout(() => {
+                state.notification.show = false;
+            }, 4000);
         }
     },
     actions: {
@@ -142,9 +157,10 @@ const store = createStore({
         deleteSurvey({}, id) {
             return axiosClient.delete(`/survey/${id}`);
         },
-        getSurveys({ commit }) {
+        getSurveys({ commit }, { url = null } = {}) {
+            url = url || '/survey';
             commit('setSurveysLoading', true);
-            return axiosClient.get('/survey').then((res) => {
+            return axiosClient.get(url).then((res) => {
                 commit('setSurveysLoading', false);
                 commit('setSurveys', res.data);
                 console.log(res.data.data);

@@ -139,7 +139,8 @@
           </div>
         </div>
       </nav>
-      </div>
+      </div>     <Notification/>
+
       <!-- inherit Dashboard or survey according to defination routes -->
      <router-view/>
 </template>
@@ -175,6 +176,7 @@ const navigationGuest=[
 };
 </script> -->
 <script setup>
+import Notification from "../components/Notification.vue";
 import { ref } from "vue";
   import { computed } from 'vue';
   import { useStore } from 'vuex';
