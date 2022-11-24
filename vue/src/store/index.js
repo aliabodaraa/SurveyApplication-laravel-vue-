@@ -166,7 +166,27 @@ const store = createStore({
                 console.log(res.data.data);
                 return res;
             });
+        },
+        getSurveyBySlug({ commit }, slug) {
+            console.log(slug);
+            commit('setCurrentSurveyLoading', true);
+            return axiosClient.get(`/survey-by-slug/${slug}`)
+                .then((res) => {
+                    commit('setCurrentSurvey', res.data);
+                    commit('setCurrentSurveyLoading', false);
+                    return res;
+                }).catch((error) => {
+                    commit('setCurrentSurveyLoading', false);
+                    //debugger;
+                    throw error;
+                });
+        },
+        saveSurveyAnswer({ commit }, { surveyId, answers }) {
+            return axiosClient.post(`/survey/${surveyId}/answer`, { answers });
         }
+
+
+
     },
     modules: {
 

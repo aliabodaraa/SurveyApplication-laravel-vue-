@@ -24,7 +24,7 @@
               :style="{animationDelay: `${index *0.8}s`}"
               />
           </div>
-          <div class="flex justify-center mt-5">
+          <div v-if="surveys.data.length" class="flex justify-center mt-5">
             <nav class="relative z-0 inline-flex justify-center rounded-md shadow-sm" aria-label="Pagination">
               <a v-for="(link,i) of surveys.links" 
               :key="i" 
@@ -42,6 +42,7 @@
               ></a>
             </nav>
           </div>
+          <div v-else class="w-18 h-18 inline items-center text-red-400 bg-gray-500 p-3 rounded-md">There is no Surveys </div>
       </div>
       <!-- <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 mt-5 bg-dark-400">
       </div> -->
