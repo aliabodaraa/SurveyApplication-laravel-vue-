@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\SurveyResource;
+use DateTime;
 
 class SurveyAnswerResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class SurveyAnswerResource extends JsonResource
             'id'=>$this->id,
             'survey'=>new SurveyResource($this->survey),
             //while the survey_answers table survey_id  column so you can write here survey directely
-            'end_date'=>$this->end_date
+            'end_date'=>(new DateTime($this->end_date))->format('Y-m-d H:i:s')
         ];
     }
 }
