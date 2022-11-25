@@ -16,6 +16,10 @@ const store = createStore({
             },
             token: sessionStorage.getItem('TOKEN') //for still data when user reloading the page
         },
+        dashboard: {
+            loading: false,
+            data: {}
+        },
         currentSurvey: {
             loading: false,
             data: {
@@ -85,6 +89,12 @@ const store = createStore({
             setTimeout(() => {
                 state.notification.show = false;
             }, 4000);
+        },
+        dashboardLoading(state, loading) {
+            state.dashboard.loading = loading;
+        },
+        setDashboardData(state, data) {
+            state.dashboard.data = data;
         }
     },
     actions: {
@@ -183,9 +193,20 @@ const store = createStore({
         },
         saveSurveyAnswer({ commit }, { surveyId, answers }) {
             return axiosClient.post(`/survey/${surveyId}/answer`, { answers });
+        },
+        getDashboardData({ commit }) {
+            commit('dashboardLoading', true);
+            return axiosClient.get("/dashboard")
+                .then((res) => {
+                    commit('dashboardLoading', false);
+                    commit('setDashboardData', res.data);
+                    return res;
+                }).catch((error) => {
+                    commit('dashboardLoading', false);
+                    return error;
+                });
+
         }
-
-
 
     },
     modules: {
