@@ -148,15 +148,19 @@ class SurveyController extends Controller
         //return response()->json("DONE Update", 200);
         $data = $request->validated();
         if(isset($data['image'])){
+            //first delete the previous image
+            if($survey->image){
+                $absolutePath = public_path($survey->image);
+                File::delete($absolutePath);
+            }
+            //add a new image
             $relativePath= $this->saveImage($data['image']);
             $data['image']=$relativePath;
         }
 
         //if there is an old image , delete it
-        if($survey->image){
-            $absolutePath = public_path($survey->image);
-            File::delete($absolutePath);
-        }
+
+        
         $survey->update($data);
         //UPDATE QUESTIONS FOR SPESIFIC SURVEY
 

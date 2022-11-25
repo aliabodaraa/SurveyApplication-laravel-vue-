@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="bg-white shadow-md p-3 row-span-2 order-3 lg:order-1 animate-fade-in-down" style="animation-delay:0.3s">
-            <h3 class="text-2xl font-semibold">Latest Surveys</h3>
+            <h3 class="text-2xl font-semibold mb-4">Latest Survey</h3>
             <img :src="data.latestSurvey.image_url" alt="latestSurvey image" class="w-[240px] mx-auto">
             <div class="text-xl font-semibold flex-1 flex items-center justify-center">
                 {{ data.latestSurvey.title }}
@@ -40,7 +40,7 @@
                 <div>Status :</div>
                 <div>{{ data.latestSurvey.status? "Active":"Draft" }}</div>
             </div>
-            <div class="flex justify-between text-sm mb-3">
+            <div class="flex justify-between text-sm mb-1">
                 <div>Questions for latest Survey :</div>
                 <div>{{ data.latestSurvey.questions }}</div>
             </div>
