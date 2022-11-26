@@ -1,7 +1,7 @@
 <template>
     <div v-if="notification.show" 
     class="animate-fade-in-down fixed 
-    w-[300px] right-0 bottom-3 py-2 px-4 text-white"
+    w-[400px] right-0 top-13 p-4 text-white z-10"
     :class="[notification.type ==='success' ?' bg-emerald-500':'bg-red-500']">
         {{ notification.message }}
     </div>

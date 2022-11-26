@@ -15,7 +15,7 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function(){
+Route::middleware('auth:sanctum')->group(function(){//for stateful authentication
     Route::get('/user', function (Request $request) {
         return $request->user();
     });

@@ -14,7 +14,7 @@
       </template>
       <div v-if="surveys.loading" class="flex justify-center">Loading ...</div>
       <div v-else>
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 mt-5 bg-dark-400">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5 mt-5 bg-dark-400">
               <SurveyListIem 
               v-for="(survey,index) in surveys.data" 
               :key="survey.id" 
