@@ -110,7 +110,7 @@ const errors=ref('');
     router.push({name:"Dashboard"});
   }).catch((err)=>{
     loadingBtn.value=false;
-    errors.value = err.response.data.errors;
+    errors.value = "err.response.data.errors";
     });
 }
 </script>

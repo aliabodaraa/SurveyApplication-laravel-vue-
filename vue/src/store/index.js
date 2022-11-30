@@ -54,19 +54,20 @@ const store = createStore({
             state.user.data.name = obj.new_name;
         },
         //accual
-        logout: state => {
+        logout: (state) => {
             console.log("aloshe logout");
             state.user.data = {};
-            state.user.token = null;
-            sessionStorage.removeItem("TOKEN");
+            //state.user.token = null;
+            //sessionStorage.removeItem("TOKEN");
             sessionStorage.removeItem("name");
         },
         setUser: (state, userDataRes) => {
             //console.log("HELLO", userDataRes.data.token);
-            state.user.token = userDataRes.token;
-            state.user.data = userDataRes.data;
-            sessionStorage.setItem("name", userDataRes.data.user.name);
-            sessionStorage.setItem("TOKEN", userDataRes.data.token); //save token that comes from backend in a session storage
+            state.user.token = userDataRes.authorization.token;
+            state.user.data = userDataRes.user;
+            sessionStorage.setItem("name", state.user.data.name);
+            sessionStorage.setItem("TOKEN", state.user.token); //save token that comes from backend in a session storage
+            console.log(userDataRes);
         },
         setCurrentSurvey(state, survey) {
             state.currentSurvey.data = survey.data;
@@ -95,7 +96,22 @@ const store = createStore({
         },
         setDashboardData(state, data) {
             state.dashboard.data = data;
-        }
+        },
+        // updateToken(state, token) {
+        //     sessionStorage.setItem("TOKEN", token);
+        //     state.user.token = token;
+        // },
+        updateClearToken(state, { token = null } = {}) {
+            if (token) {
+                console.log("token ==>  " + token + "Updated Done");
+                sessionStorage.setItem("TOKEN", token);
+                state.user.token = token;
+            } else {
+                sessionStorage.removeItem("TOKEN");
+                state.user.token = '';
+                console.log("token ==>  Clear Done");
+            }
+        },
     },
     actions: {
         //is async it invoke maybe some of actions or mutations via({commit})
@@ -113,7 +129,8 @@ const store = createStore({
         async login({ commit }, user) {
             return await axiosClient.post('/login', user)
                 .then((res) => {
-                    commit("setUser", res);
+                    commit("setUser", res.data);
+                    console.log(res.data);
                     return res;
                 });
         },
@@ -122,6 +139,7 @@ const store = createStore({
                 .then((response) => {
                     console.log("in store", response);
                     commit('logout');
+                    commit('updateClearToken');
                     //return response;
                 }).catch((err) => console.log(err))
         },
@@ -175,6 +193,8 @@ const store = createStore({
                 commit('setSurveys', res.data);
                 console.log(res.data.data);
                 return res;
+            }).catch((r) => {
+                console.log(r.response.status, "))))))))))");
             });
         },
         getSurveyBySlug({ commit }, slug) {
@@ -206,8 +226,23 @@ const store = createStore({
                     return error;
                 });
 
+        },
+        checkJwt({ commit }) {
+            return axiosClient.get("/checkJwt")
+                .then((res1) => {
+                    if (!res1.data.valid || !sessionStorage.getItem('TOKEN')) {
+                        return axiosClient.get("/refresh")
+                            .then((res) => {
+                                commit('updateClearToken', { token: res.data.authorization.token });
+                                return "valid = " + res1.data.valid + " the new token is : " + res.data.authorization.token; //return the token to .then(()=>{...}); in Surveys Component
+                            }).catch((err) => {
+                                return err;
+                            });
+                    } else {
+                        return "valid = " + res1.data.valid; //return true for .then(()=>{...}); in Surveys Component
+                    }
+                });
         }
-
     },
     modules: {
 

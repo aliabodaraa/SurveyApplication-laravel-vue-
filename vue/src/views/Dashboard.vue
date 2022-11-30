@@ -6,7 +6,7 @@
     aaaaaaa
 
 
-
+{{ token }}
 
     <div v-if="loading" class="flex justify-center">Loading ...</div>
     <div v-else class="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-gray-700">
@@ -100,13 +100,20 @@
 <script setup>
  import PageComponents from "../components/PageComponents.vue";
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { ref,computed } from "vue";
 
 const store = useStore();
 const loading = computed(() => store.state.dashboard.loading);
 const data = computed(() => store.state.dashboard.data);
 console.log("aaaaa",data.value.latestSurvey);
+
+//added
+let token = computed(() => store.state.user.token);
 store.dispatch("getDashboardData");
+store.dispatch('checkJwt');
+//added
+
+
  </script>
 <style scoped>
 

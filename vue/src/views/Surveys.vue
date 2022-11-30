@@ -1,5 +1,6 @@
 <template>
     <!-- inherit -->
+    {{ token }}
     <PageComponents title="Survey-title">
       <template slot:header v-slot:header>You overwriting the slot header in  survey v-slot:header
         <div class="py-2 px-3">
@@ -27,7 +28,7 @@
           <div v-if="surveys.data.length" class="flex justify-center mt-5">
             <nav class="relative z-0 inline-flex justify-center rounded-md shadow-sm" aria-label="Pagination">
               <a v-for="(link,i) of surveys.links" 
-              :key="i" 
+              :key="i"
               :disabled="!link.url"
               v-html="link.label"
               href="#"
@@ -54,7 +55,17 @@
       import SurveyListIem from "../components/SurveyListItem.vue";
      import PageComponents from "../components/PageComponents.vue";
      import store from "../store";
-     import { computed } from "vue";
+     import { computed, ref } from "vue";
+
+    //added
+    let token = computed(() => store.state.user.token);
+    store.dispatch('getSurveys');
+    store.dispatch('checkJwt');
+    //added
+
+
+
+
     const surveys=computed(()=>{return store.state.surveys;}) //it is true but why we use computed
 
      console.log(surveys)
@@ -65,12 +76,10 @@
         });
       }
      }
-     
 
+     //store.dispatch('checkJwt');//added
      //get all surveys from DB
      
-     store.dispatch('getSurveys');
-
 
      function getForPage(ev,link){
       ev.preventDefault();//to prevent next button when current page is the last to scroll to the top of page

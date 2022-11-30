@@ -8,7 +8,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class AuthApiController extends Controller
-{
+{    
+    
+    public function __construct()
+    {
+        //$this->middleware('jwt.verify', ['except' => ['login']]);
+    }
 
     public function store(Request $request)
     {
@@ -50,31 +55,50 @@ public function login(Request $request){
             ['email.exists'=>'This Email Does not Exist in Users Table'
             ]
         );
-    //$cerdentials = $request->only('email','password');
-    $cerdentials = $request->all();
+    //$credentials = $request->only('email','password');
+    $credentials = $request->all();
     $remember=$request['remember'] ?? false;
-    unset($cerdentials['remember']);//destroy from the assosative array
-    if( Auth::guard('web')->attempt($cerdentials,$remember) ){
-        $user=Auth::user();
-        $token=$user->createToken('main')->plainTextToken;
-        return response([
-            'user'=>$user,
-            'token'=>$token
-        ]);
-    }else{
-        return response([
-            'error'=>'The Provided Credentials are not correct'
-        ],442);  
+    unset($credentials['remember']);//destroy from the assosative array
+    $token = Auth::attempt($credentials);
+    if(! $token){
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Unauthorized',
+        ], 401);
     }
+    $user=Auth::user();
+    return [
+        'status' => 'success',
+        'user' => $user,
+        'authorization' => [
+            'token' => $token,
+            'type' => 'bearer',
+        ]
+    ];
+
 }
+
 public function logout(){
-    // Auth::user()->tokens->each(function($token) {
-    //     $token->delete();
-    // });
-//Auth::logout();
+    Auth::logout();
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Successfully logged out',
+    ]);
+}
 
-Auth::user()->currentAccessToken()->delete();
-return response()->json('Successfully logged out');
+public function refresh()
+{
+    return response()->json([
+        'status' => 'success',
+        'user' => Auth::user(),
+        'authorization' => [
+            'token' => Auth::refresh(),
+            'type' => 'bearer',
+        ]
+    ]);
+}
 
-} 
+public function checkJwt(){
+    return response()->json(['valid' => auth()->check()]);
+}
 }
