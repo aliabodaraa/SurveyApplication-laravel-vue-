@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthApiController extends Controller
 {    
     
     public function __construct()
     {
-        //$this->middleware('jwt.verify', ['except' => ['login']]);
+        $this->middleware('jwtauth', ['except' => ['login']]);
     }
 
     public function store(Request $request)
@@ -55,50 +56,24 @@ public function login(Request $request){
             ['email.exists'=>'This Email Does not Exist in Users Table'
             ]
         );
-    //$credentials = $request->only('email','password');
     $credentials = $request->all();
     $remember=$request['remember'] ?? false;
     unset($credentials['remember']);//destroy from the assosative array
-    $token = Auth::attempt($credentials);
-    if(! $token){
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Unauthorized',
-        ], 401);
-    }
-    $user=Auth::user();
-    return [
-        'status' => 'success',
-        'user' => $user,
-        'authorization' => [
-            'token' => $token,
-            'type' => 'bearer',
-        ]
-    ];
 
+    if(! $token = JWTAuth::attempt($credentials)){
+        return response()->json(['success' => false], 401);
+    }
+    return response()->json(['success' => true, 'token' => $token],200);
+}
+
+public function checkToken(){
+    return response()->json(['valid' => auth()->check()]);
 }
 
 public function logout(){
     Auth::logout();
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Successfully logged out',
-    ]);
+    return response()->json(['success' => true],200);
 }
 
-public function refresh()
-{
-    return response()->json([
-        'status' => 'success',
-        'user' => Auth::user(),
-        'authorization' => [
-            'token' => Auth::refresh(),
-            'type' => 'bearer',
-        ]
-    ]);
-}
 
-public function checkJwt(){
-    return response()->json(['valid' => auth()->check()]);
-}
 }

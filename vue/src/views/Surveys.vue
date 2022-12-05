@@ -1,6 +1,7 @@
 <template>
     <!-- inherit -->
     {{ token }}
+
     <PageComponents title="Survey-title">
       <template slot:header v-slot:header>You overwriting the slot header in  survey v-slot:header
         <div class="py-2 px-3">
@@ -48,27 +49,28 @@
       <!-- <div v-else class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 mt-5 bg-dark-400">
       </div> -->
     </PageComponents>
-    
+
+    <!-- <PopupModel v-if="store.state.user.watingToken"/> -->
     <!-- inherit -->
     </template>
     <script setup>
-      import SurveyListIem from "../components/SurveyListItem.vue";
+     import SurveyListIem from "../components/SurveyListItem.vue";
      import PageComponents from "../components/PageComponents.vue";
      import store from "../store";
-     import { computed, ref } from "vue";
+     import { computed, ref,onMounted  } from "vue";
 
-    //added
+    onMounted(() => {
+      store.dispatch('checkToken');
+    });
     let token = computed(() => store.state.user.token);
     store.dispatch('getSurveys');
-    store.dispatch('checkJwt');
-    //added
 
 
 
 
     const surveys=computed(()=>{return store.state.surveys;}) //it is true but why we use computed
 
-     console.log(surveys)
+     //console.log(surveys)
      function deleteServey(survey){
       if(confirm("Are You Sure You Want To Delete This Survey ? Operation Can't Be Undone !!")){
         store.dispatch('deleteSurvey',survey.id).then(()=>{

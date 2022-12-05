@@ -1,12 +1,13 @@
 import axios from "axios";
 import { createStore } from "vuex";
 import axiosClient from "../axios";
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const store = createStore({
     state: {
         user: {
             data: {
-                name: sessionStorage.getItem('name'),
+                name: '',
                 email: null,
                 password: null,
                 password_confirmation: null,
@@ -14,7 +15,8 @@ const store = createStore({
                 created_at: null,
                 updated_at: null,
             },
-            token: sessionStorage.getItem('TOKEN') //for still data when user reloading the page
+            token: sessionStorage.getItem('TOKEN'), //for still data when user reloading the page
+            watingToken: false,
         },
         dashboard: {
             loading: false,
@@ -61,14 +63,14 @@ const store = createStore({
             //sessionStorage.removeItem("TOKEN");
             sessionStorage.removeItem("name");
         },
-        setUser: (state, userDataRes) => {
-            //console.log("HELLO", userDataRes.data.token);
-            state.user.token = userDataRes.authorization.token;
-            state.user.data = userDataRes.user;
-            sessionStorage.setItem("name", state.user.data.name);
-            sessionStorage.setItem("TOKEN", state.user.token); //save token that comes from backend in a session storage
-            console.log(userDataRes);
-        },
+        // setUser: (state, userDataRes) => {
+        //     //console.log("HELLO", userDataRes.data.token);
+        //     state.user.token = userDataRes.token;
+        //     state.user.data = userDataRes.user;
+        //     sessionStorage.setItem("name", state.user.data.name);
+        //     sessionStorage.setItem("TOKEN", state.user.token); //save token that comes from backend in a session storage
+        //     console.log(userDataRes);
+        // },
         setCurrentSurvey(state, survey) {
             state.currentSurvey.data = survey.data;
         },
@@ -101,17 +103,21 @@ const store = createStore({
         //     sessionStorage.setItem("TOKEN", token);
         //     state.user.token = token;
         // },
-        updateClearToken(state, { token = null } = {}) {
-            if (token) {
-                console.log("token ==>  " + token + "Updated Done");
-                sessionStorage.setItem("TOKEN", token);
-                state.user.token = token;
-            } else {
-                sessionStorage.removeItem("TOKEN");
-                state.user.token = '';
-                console.log("token ==>  Clear Done");
+        updateClearToken(state, { token1 = null } = {}) {
+            if (token1) {
+                console.log("token ==>  " + token1 + " Updated Done");
+                sessionStorage.setItem("TOKEN", token1);
+                state.user.token = token1;
             }
+            //  else {
+            //     sessionStorage.removeItem("TOKEN");
+            //     state.user.token = '';
+            //     console.log("token ==>  Clear Done");
+            // }
         },
+        toggleWarningToken(state, toggeleBool) {
+            state.user.watingToken = toggeleBool;
+        }
     },
     actions: {
         //is async it invoke maybe some of actions or mutations via({commit})
@@ -122,15 +128,15 @@ const store = createStore({
         async register({ commit }, user) {
             return await axiosClient.post('/store', user)
                 .then((res) => {
-                    commit("setUser", res);
+                    commit("updateClearToken", res);
                     return res; //to then in register component
                 });
         },
         async login({ commit }, user) {
             return await axiosClient.post('/login', user)
                 .then((res) => {
-                    commit("setUser", res.data);
                     console.log(res.data);
+                    commit("updateClearToken", { token1: res.data.token });
                     return res;
                 });
         },
@@ -227,21 +233,21 @@ const store = createStore({
                 });
 
         },
-        checkJwt({ commit }) {
-            return axiosClient.get("/checkJwt")
-                .then((res1) => {
-                    if (!res1.data.valid || !sessionStorage.getItem('TOKEN')) {
-                        return axiosClient.get("/refresh")
-                            .then((res) => {
-                                commit('updateClearToken', { token: res.data.authorization.token });
-                                return "valid = " + res1.data.valid + " the new token is : " + res.data.authorization.token; //return the token to .then(()=>{...}); in Surveys Component
-                            }).catch((err) => {
-                                return err;
-                            });
-                    } else {
-                        return "valid = " + res1.data.valid; //return true for .then(()=>{...}); in Surveys Component
-                    }
-                });
+        checkToken({ commit }) {
+            if (store.state.user.token !== '') {
+                return axiosClient.post("/checkToken", { token: store.state.user.token })
+                    .then((res) => {
+                        if (res.data.valid == true) {
+                            console.log("validToken");
+                            commit("toggleWarningToken", false);
+                        } else { //when the token be expired
+                            commit('updateClearToken', { token1: res.data.token });
+                            commit("toggleWarningToken", true);
+                        }
+                    }).catch((err) => {});
+            } else {
+                console.log("toDashboard");
+            }
         }
     },
     modules: {

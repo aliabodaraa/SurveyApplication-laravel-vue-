@@ -94,25 +94,31 @@
 
 </PageComponents>
 
+
 <!-- inherit -->
     
 </template>
 <script setup>
- import PageComponents from "../components/PageComponents.vue";
+import PageComponents from "../components/PageComponents.vue";
 import { useStore } from "vuex";
-import { ref,computed } from "vue";
-
+import { ref,computed,onMounted } from "vue";
 const store = useStore();
+onMounted(() => {
+  store.dispatch('checkToken');
+});
+
 const loading = computed(() => store.state.dashboard.loading);
 const data = computed(() => store.state.dashboard.data);
-console.log("aaaaa",data.value.latestSurvey);
+//console.log("aaaaa",data.value.latestSurvey);
 
 //added
 let token = computed(() => store.state.user.token);
 store.dispatch("getDashboardData");
-store.dispatch('checkJwt');
 //added
 
+// function requestToken(){
+//     store.state.user.watingToken = false;
+// }
 
  </script>
 <style scoped>

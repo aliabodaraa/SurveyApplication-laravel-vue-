@@ -190,7 +190,7 @@
         });
     }
     function saveSurvey(){
-        console.log(model.value);
+        //console.log(model.value);
             store.dispatch("saveSurvey", model.value)
             .then((id)=>{
                 store.commit('notify',
